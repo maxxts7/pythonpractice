@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyPractice — Solve</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/practice.css" />
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <p id="loading-text">Loading Python environment...</p>
+  </div>
+
+  <div class="ide-root">
+    <!-- Activity Bar (far left) -->
+    <aside class="activity-bar">
+      <div class="activity-icons-top">
+        <button class="activity-icon active" data-panel="test-explorer" title="Test Explorer">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3h6v5l3 3-3 3v5H9v-5L6 11l3-3V3z"/>
+          </svg>
+        </button>
+        <button class="activity-icon" data-panel="problem-desc" title="Problem Description">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </button>
+      </div>
+      <div class="activity-icons-bottom">
+        <button class="activity-icon" onclick="window.location.href='index.html'" title="Back to Problems">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </button>
+        <button class="activity-icon" title="Settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Side Panel -->
+    <aside class="side-panel">
+      <!-- Test Explorer View -->
+      <div class="side-view active" id="test-explorer-view">
+        <div class="side-view-header">
+          <span class="side-view-title">Test Explorer</span>
+        </div>
+        <div class="test-tree" id="test-tree">
+          <div class="tree-placeholder">
+            Run tests to see results here
+          </div>
+        </div>
+      </div>
+
+      <!-- Problem Description View -->
+      <div class="side-view" id="problem-desc-view">
+        <div class="side-view-header">
+          <span class="side-view-title">Problem Description</span>
+        </div>
+        <div class="side-view-body">
+          <div class="sidebar-header">
+            <h2 id="sidebar-title">Problem</h2>
+            <span class="badge" id="sidebar-badge"></span>
+          </div>
+          <div class="sidebar-content" id="sidebar-content">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Area (editor + output) -->
+    <div class="right-area">
+      <!-- Editor Panel -->
+      <section class="editor-panel">
+        <div class="editor-tab-bar">
+          <div class="editor-tabs-left">
+            <button class="editor-tab active" data-tab="solution">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;opacity:0.5;">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+              solution.py
+            </button>
+            <button class="editor-tab" data-tab="test" id="test-file-tab">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:middle;opacity:0.5;">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+              <span id="test-file-tab-name">test_file.py</span>
+            </button>
+          </div>
+          <div class="editor-tabs-right">
+            <button class="tab-action-btn" id="run-btn" disabled title="Run Tests">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run
+            </button>
+            <button class="tab-action-btn" id="solution-btn" title="Show Solution">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              Solution
+            </button>
+            <button class="tab-action-btn" id="reset-btn" title="Reset to starter code">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+              </svg>
+              Reset
+            </button>
+            <span class="kbd-badge">Ctrl+Enter</span>
+          </div>
+        </div>
+        <div id="editor-container"></div>
+      </section>
+
+      <!-- Resize Handle -->
+      <div class="resize-handle" id="resize-handle"></div>
+
+      <!-- Output Panel -->
+      <section class="output-panel">
+        <div class="output-tab-bar">
+          <button class="output-tab active" data-tab="results">Test Results</button>
+          <button class="output-tab" data-tab="console">Console</button>
+        </div>
+        <div class="output-content">
+          <div class="output-pane active" id="results-pane">
+            <div class="test-placeholder">
+              <span class="icon">&#9654;</span>
+              <span>Click "Run" or press Ctrl+Enter to run your code</span>
+            </div>
+          </div>
+          <div class="output-pane" id="console-pane">
+            <div class="console-output" id="console-output"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Floating Status Bar -->
+  <footer class="status-bar" id="status-bar">
+    <div class="status-left">
+      <span class="status-item" id="status-problem">Loading...</span>
+    </div>
+    <div class="status-right">
+      <span class="status-item" id="status-tests"></span>
+      <span class="status-item" id="status-pyodide">
+        <span class="status-dot loading"></span> Python: Loading
+      </span>
+    </div>
+  </footer>
+
+  <!-- Pyodide from CDN -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+  <script type="module" src="/src/practice-page.js"></script>
+</body>
+</html>

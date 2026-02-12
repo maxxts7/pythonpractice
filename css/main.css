@@ -1,0 +1,393 @@
+/* === Main Page Header === */
+.main-header {
+  padding: 56px 32px 48px;
+  text-align: center;
+  background: linear-gradient(160deg, #0a0a12 0%, #12102a 40%, #1a1040 70%, #0f0f1a 100%);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-header::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.main-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+.main-header h1 span {
+  background: linear-gradient(135deg, var(--accent-primary), #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.main-header p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* === Problem Grid === */
+.problems-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.problems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* === Problem Card === */
+.problem-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.problem-card:hover {
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.card-description {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.card-footer .btn {
+  font-size: 13px;
+}
+
+.problem-number {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* === Stats Bar === */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 20px 24px;
+  margin-bottom: 8px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stat-count {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.stat-count.easy { color: var(--success); }
+.stat-count.medium { color: var(--warning); }
+.stat-count.hard { color: var(--error); }
+
+/* === Upload Button === */
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 8px 20px;
+  background: var(--accent-primary-muted);
+  border: 1px dashed rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.upload-btn:hover {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--text-bright);
+  border-color: var(--accent-primary);
+}
+
+/* === Upload Modal === */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-dialog {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 480px;
+  max-width: 90vw;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 12px;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-bright);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+}
+
+.modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-bright);
+}
+
+.modal-body {
+  padding: 8px 24px 16px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-label .required {
+  color: var(--error);
+}
+
+.form-label .optional {
+  font-weight: 400;
+  font-size: 11px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-bright);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.form-input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-muted);
+}
+
+.difficulty-picker {
+  display: flex;
+  gap: 16px;
+}
+
+.diff-option {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.diff-option input[type="radio"] {
+  accent-color: var(--accent-primary);
+}
+
+.file-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+  transition: all var(--transition-fast);
+}
+
+.file-drop:hover,
+.file-drop.dragover {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary-muted);
+}
+
+.file-drop.has-file {
+  border-color: var(--success);
+  border-style: solid;
+}
+
+.file-name {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+.upload-preview {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.upload-preview .preview-title {
+  font-weight: 700;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.upload-preview .preview-row {
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.upload-preview .preview-label {
+  color: var(--text-secondary);
+  min-width: 70px;
+}
+
+.upload-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--error);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 24px 20px;
+}
+
+/* === Delete button on custom problem cards === */
+.card-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 16px;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.card-delete-btn:hover {
+  color: var(--error);
+  background: var(--error-bg);
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .main-header {
+    padding: 32px 20px;
+  }
+
+  .main-header h1 {
+    font-size: 24px;
+  }
+
+  .problems-container {
+    padding: 20px 16px 48px;
+  }
+
+  .problems-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-bar {
+    gap: 20px;
+  }
+}
