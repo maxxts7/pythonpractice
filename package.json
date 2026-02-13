@@ -11,11 +11,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "monaco-editor": "^0.55.1",
-    "vscode-oniguruma": "^2.0.1",
-    "vscode-textmate": "^9.3.2"
+    "@codingame/monaco-vscode-api": "25.1.2",
+    "@codingame/monaco-vscode-configuration-service-override": "25.1.2",
+    "@codingame/monaco-vscode-languages-service-override": "25.1.2",
+    "@codingame/monaco-vscode-python-default-extension": "25.1.2",
+    "@codingame/monaco-vscode-textmate-service-override": "25.1.2",
+    "@codingame/monaco-vscode-theme-defaults-default-extension": "25.1.2",
+    "@codingame/monaco-vscode-theme-service-override": "25.1.2",
+    "monaco-editor": "npm:@codingame/monaco-vscode-editor-api@25.1.2",
+    "vscode": "npm:@codingame/monaco-vscode-extension-api@25.1.2"
   },
   "devDependencies": {
+    "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
     "vite": "^7.3.1"
   }
 }

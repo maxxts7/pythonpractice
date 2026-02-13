@@ -1,8 +1,7 @@
 /* === Editor Setup & Wiring === */
 
 import * as monaco from "monaco-editor";
-import "./monaco-setup.js";
-import { activateTextMateGrammars } from "./textmate-setup.js";
+import { servicesReady } from "./monaco-setup.js";
 import { PROBLEMS } from "./problems.js";
 import { initializePyodide, executeTests, isPyodideReady } from "./pyodide-runner.js";
 import {
@@ -22,6 +21,7 @@ import {
   escapeHtml,
 } from "./ui.js";
 import { registerPythonSemanticTokensProvider } from "./semantic-tokens.js";
+import { registerPythonCompletionProvider } from "./python-completions.js";
 
 let monacoEditor = null;
 let currentProblem = null;
@@ -176,98 +176,7 @@ function switchEditorTab(tab) {
 }
 
 async function initMonaco(problem) {
-  // Activate TextMate grammars before creating editor
-  await activateTextMateGrammars();
-
-  // Define Obsidian Forge theme (VS Code Dark+ colors)
-  monaco.editor.defineTheme("obsidian-forge", {
-    base: "vs-dark",
-    inherit: true,
-    rules: [
-      // Comments — green italic
-      { token: "comment", foreground: "6a9955", fontStyle: "italic" },
-
-      // Keywords — blue
-      { token: "keyword", foreground: "569cd6" },
-
-      // Operators — light gray
-      { token: "operator", foreground: "d4d4d4" },
-
-      // Strings — orange-brown
-      { token: "string", foreground: "ce9178" },
-
-      // Numbers — light green
-      { token: "number", foreground: "b5cea8" },
-
-      // Constants (True, False, None) — blue
-      { token: "constant", foreground: "569cd6" },
-
-      // Function definitions — light yellow
-      { token: "function", foreground: "dcdcaa" },
-
-      // Function calls — light yellow
-      { token: "function-call", foreground: "dcdcaa" },
-
-      // Built-in functions (print, len, range) — light yellow
-      { token: "builtin", foreground: "dcdcaa" },
-
-      // Magic methods (__init__, __str__) — light yellow
-      { token: "magic", foreground: "dcdcaa" },
-
-      // Types & classes — teal green
-      { token: "type", foreground: "4ec9b0" },
-
-      // Variables — light blue
-      { token: "variable", foreground: "9cdcfe" },
-
-      // Function parameters — light blue
-      { token: "parameter", foreground: "9cdcfe" },
-
-      // self/cls — blue keyword
-      { token: "self", foreground: "569cd6", fontStyle: "italic" },
-
-      // Decorators — light yellow
-      { token: "decorator", foreground: "dcdcaa" },
-
-      // Delimiters — light gray
-      { token: "delimiter", foreground: "d4d4d4" },
-
-      // Identifiers (fallback)
-      { token: "identifier", foreground: "9cdcfe" },
-
-      // Semantic token rules
-      { token: "variable.declaration", foreground: "9cdcfe" },
-      { token: "variable-undefined", foreground: "f44747", fontStyle: "underline" },
-      { token: "selfParameter", foreground: "569cd6", fontStyle: "italic" },
-      { token: "function.magic", foreground: "dcdcaa" },
-      { token: "module", foreground: "4ec9b0" },
-    ],
-    colors: {
-      "editor.background": "#0a0a12",
-      "editor.foreground": "#d4d4d4",
-      "editor.lineHighlightBackground": "#12121f",
-      "editor.lineHighlightBorder": "#00000000",
-      "editor.selectionBackground": "#8b5cf633",
-      "editor.inactiveSelectionBackground": "#8b5cf61a",
-      "editorCursor.foreground": "#a78bfa",
-      "editorLineNumber.foreground": "#2a2a3a",
-      "editorLineNumber.activeForeground": "#71717a",
-      "editorIndentGuide.background": "#1a1a28",
-      "editorIndentGuide.activeBackground": "#2a2a40",
-      "editor.selectionHighlightBackground": "#8b5cf61a",
-      "editorBracketMatch.background": "#8b5cf620",
-      "editorBracketMatch.border": "#8b5cf640",
-      "editorWidget.background": "#0f0f1a",
-      "editorWidget.border": "#ffffff10",
-      "editorSuggestWidget.background": "#0f0f1a",
-      "editorSuggestWidget.border": "#ffffff10",
-      "editorSuggestWidget.selectedBackground": "#1c1c30",
-      "list.hoverBackground": "#1c1c30",
-      "scrollbarSlider.background": "#ffffff10",
-      "scrollbarSlider.hoverBackground": "#ffffff18",
-      "scrollbarSlider.activeBackground": "#ffffff22",
-    },
-  });
+  await servicesReady;
 
   const storageKey = `pypractice-code-${problem.id}`;
   const savedCode = localStorage.getItem(storageKey);
@@ -281,7 +190,6 @@ async function initMonaco(problem) {
     {
       model: solutionModel,
       language: "python",
-      theme: "obsidian-forge",
       fontSize: 14,
       fontFamily: "'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace",
       fontLigatures: true,
@@ -306,6 +214,9 @@ async function initMonaco(problem) {
 
   // Register semantic token highlighting (uses Pyodide AST analysis)
   registerPythonSemanticTokensProvider();
+
+  // Register Jedi-powered autocomplete
+  registerPythonCompletionProvider();
 
   // Auto-save to localStorage on change (solution model only)
   solutionModel.onDidChangeContent(() => {

@@ -2,19 +2,85 @@
 
 let pyodideInstance = null;
 let _pyodideReady = false;
+let _jediReady = false;
 
 export function isPyodideReady() {
   return _pyodideReady;
+}
+
+export function isJediReady() {
+  return _jediReady;
 }
 
 export async function initializePyodide() {
   try {
     pyodideInstance = await window.loadPyodide();
     _pyodideReady = true;
+
+    // Install jedi for autocompletion (non-blocking — don't delay startup)
+    installJedi();
+
     return true;
   } catch (err) {
     console.error("Failed to load Pyodide:", err);
     return false;
+  }
+}
+
+async function installJedi() {
+  try {
+    await pyodideInstance.loadPackage("micropip");
+    const micropip = pyodideInstance.pyimport("micropip");
+    await micropip.install("jedi");
+    // Pre-import so first completion isn't slow
+    await pyodideInstance.runPythonAsync("import jedi");
+    _jediReady = true;
+    console.log("Jedi autocompletion ready");
+  } catch (err) {
+    console.warn("Failed to install jedi:", err);
+  }
+}
+
+let _jediLock = false;
+
+export async function getJediCompletions(code, line, column) {
+  if (!_pyodideReady || !_jediReady || !pyodideInstance) {
+    return [];
+  }
+
+  // Prevent concurrent jedi calls
+  if (_jediLock) return [];
+  _jediLock = true;
+
+  try {
+    const resultJson = await pyodideInstance.runPythonAsync(`
+import jedi
+import json as _json
+
+def _jedi_complete(source, line, column):
+    try:
+        script = jedi.Script(source)
+        completions = script.complete(line, column)
+        results = []
+        for c in completions[:50]:
+            results.append({
+                "name": c.name,
+                "type": c.type,
+                "description": c.description,
+                "module_name": c.module_name if c.module_name else "",
+            })
+        return results
+    except Exception:
+        return []
+
+_json.dumps(_jedi_complete(${JSON.stringify(code)}, ${line}, ${column}))
+`);
+    return JSON.parse(resultJson);
+  } catch (err) {
+    console.warn("Jedi completion failed:", err);
+    return [];
+  } finally {
+    _jediLock = false;
   }
 }
 
