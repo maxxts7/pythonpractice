@@ -44,6 +44,129 @@
   position: relative;
 }
 
+/* === Header Actions (Upload + Git Import buttons) === */
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  position: relative;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: var(--accent-primary-muted);
+  border: 1px dashed rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.action-btn:hover {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--text-bright);
+  border-color: var(--accent-primary);
+  border-style: solid;
+}
+
+/* === Tab Bar === */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  position: relative;
+}
+
+.tab:hover {
+  color: var(--text-bright);
+  background: var(--bg-hover);
+}
+
+.tab.active {
+  color: var(--text-bright);
+  background: var(--accent-primary-muted);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tab.active .tab-count {
+  background: rgba(139, 92, 246, 0.2);
+  color: var(--accent-primary-hover);
+}
+
+.tab-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: all var(--transition-fast);
+  margin-left: 2px;
+}
+
+.tab:hover .tab-delete {
+  opacity: 1;
+}
+
+.tab-delete:hover {
+  color: var(--error);
+  background: var(--error-bg);
+}
+
 /* === Problem Grid === */
 .problems-container {
   max-width: 1200px;
@@ -114,60 +237,66 @@
   font-size: 13px;
 }
 
-.problem-number {
-  font-size: 12px;
-  color: var(--text-secondary);
+/* === Source badge on cards === */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  background: var(--accent-secondary-muted);
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
   font-weight: 500;
+  color: var(--accent-secondary);
 }
 
-/* === Stats Bar === */
-.stats-bar {
+.source-badge.uploaded {
+  background: var(--accent-primary-muted);
+  border-color: rgba(139, 92, 246, 0.15);
+  color: var(--accent-primary-hover);
+}
+
+/* === Empty State === */
+.empty-state {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 32px;
-  padding: 20px 24px;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.empty-state h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-bright);
   margin-bottom: 8px;
 }
 
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.empty-state p {
   font-size: 14px;
   color: var(--text-secondary);
+  max-width: 400px;
+  margin-bottom: 24px;
 }
 
-.stat-count {
-  font-weight: 700;
-  font-size: 18px;
+.empty-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.stat-count.easy { color: var(--success); }
-.stat-count.medium { color: var(--warning); }
-.stat-count.hard { color: var(--error); }
-
-/* === Upload Button === */
-.upload-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 16px;
-  padding: 8px 20px;
-  background: var(--accent-primary-muted);
-  border: 1px dashed rgba(139, 92, 246, 0.3);
-  border-radius: var(--radius-sm);
+/* === Tab empty message === */
+.tab-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 24px;
   color: var(--text-secondary);
-  font-family: var(--font-sans);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  position: relative;
-}
-
-.upload-btn:hover {
-  background: rgba(139, 92, 246, 0.18);
-  color: var(--text-bright);
-  border-color: var(--accent-primary);
+  font-size: 14px;
 }
 
 /* === Upload Modal === */
@@ -193,6 +322,10 @@
   width: 480px;
   max-width: 90vw;
   box-shadow: var(--shadow-lg);
+}
+
+.modal-dialog-wide {
+  width: 540px;
 }
 
 .modal-header {
@@ -265,6 +398,22 @@
 .form-input:focus {
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 2px var(--accent-primary-muted);
+}
+
+.form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.form-hint code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bg-tertiary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--text-secondary);
 }
 
 .difficulty-picker {
@@ -351,6 +500,34 @@
   padding: 12px 24px 20px;
 }
 
+/* === Git Import Status === */
+.git-status {
+  margin-top: 8px;
+}
+
+.git-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.mini-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(139, 92, 246, 0.2);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* === Delete button on custom problem cards === */
 .card-delete-btn {
   background: none;
@@ -379,6 +556,11 @@
     font-size: 24px;
   }
 
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
   .problems-container {
     padding: 20px 16px 48px;
   }
@@ -387,7 +569,11 @@
     grid-template-columns: 1fr;
   }
 
-  .stats-bar {
-    gap: 20px;
+  .tab-bar {
+    gap: 2px;
+  }
+
+  .empty-actions {
+    flex-direction: column;
   }
 }
