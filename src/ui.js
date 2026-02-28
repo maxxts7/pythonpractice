@@ -28,12 +28,15 @@ export function renderTestResults(result) {
 
   // Build summary
   const passed = result.testsRun - result.failures - result.errors;
-  const allPassed = result.success;
-  const summaryClass = allPassed ? "pass" : "fail";
+  const allPassed = result.success && result.testsRun > 0;
+  const noTests = result.testsRun === 0;
+  const summaryClass = noTests ? "fail" : allPassed ? "pass" : "fail";
   const summaryIcon = allPassed ? "&#10004;" : "&#10008;";
-  const summaryText = allPassed
-    ? "All tests passed!"
-    : `${result.failures + result.errors} test(s) failed`;
+  const summaryText = noTests
+    ? "No tests were run"
+    : allPassed
+      ? "All tests passed!"
+      : `${result.failures + result.errors} test(s) failed`;
 
   let html = `
     <div class="test-summary ${summaryClass}">
@@ -289,8 +292,20 @@ export function updateTestStatusMapFromResult(result, targetClassName, targetMet
   const testLines = parseTestOutput(result.output);
 
   if (!targetClassName && !targetMethodName) {
+    // Run All: reset everything to pending first
     for (const key of Object.keys(state.testStatusMap)) {
       state.testStatusMap[key] = "pending";
+    }
+  } else {
+    // Single test/class run: reset only the targeted tests to pending
+    for (const key of Object.keys(state.testStatusMap)) {
+      if (targetMethodName) {
+        if (key === `${targetClassName}.${targetMethodName}`) {
+          state.testStatusMap[key] = "pending";
+        }
+      } else if (key.startsWith(`${targetClassName}.`)) {
+        state.testStatusMap[key] = "pending";
+      }
     }
   }
 
@@ -354,7 +369,9 @@ export function updateStatusBarAfterTests(result) {
   }
 
   const passed = result.testsRun - result.failures - result.errors;
-  if (result.success) {
+  if (result.testsRun === 0) {
+    el.textContent = `\u2718 No tests were run`;
+  } else if (result.success) {
     el.textContent = `\u2714 ${passed}/${result.testsRun} tests passed`;
   } else {
     el.textContent = `\u2718 ${passed}/${result.testsRun} tests passed`;
