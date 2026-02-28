@@ -183,12 +183,19 @@ export function renderTestTreeFromStructure() {
     return;
   }
 
-  // Preserve collapsed state before re-rendering
-  const collapsedGroups = new Set();
-  treeContainer.querySelectorAll(".tree-group.collapsed").forEach((el) => {
-    const header = el.querySelector(".tree-group-header");
-    if (header) collapsedGroups.add(header.getAttribute("data-class"));
-  });
+  // Preserve expanded/collapsed state before re-rendering
+  // Default to collapsed on first render (no existing groups in DOM)
+  const existingGroups = treeContainer.querySelectorAll(".tree-group");
+  const firstRender = existingGroups.length === 0;
+  const expandedGroups = new Set();
+  if (!firstRender) {
+    existingGroups.forEach((el) => {
+      if (!el.classList.contains("collapsed")) {
+        const header = el.querySelector(".tree-group-header");
+        if (header) expandedGroups.add(header.getAttribute("data-class"));
+      }
+    });
+  }
 
   let html = "";
 
@@ -219,8 +226,8 @@ export function renderTestTreeFromStructure() {
 
     const passCount = statuses.filter(s => s === "ok").length;
 
-    const isCollapsed = collapsedGroups.has(group.className);
-    html += `<div class="tree-group${isCollapsed ? " collapsed" : ""}">`;
+    const isExpanded = !firstRender && expandedGroups.has(group.className);
+    html += `<div class="tree-group${isExpanded ? "" : " collapsed"}">`;
     html += `<div class="tree-group-header" data-class="${escapeHtml(group.className)}">`;
     html += `<span class="tree-chevron" onclick="this.closest('.tree-group').classList.toggle('collapsed')">&#9660;</span>`;
     html += `<span class="tree-group-icon" style="color:${groupColor}">${groupIcon}</span>`;
