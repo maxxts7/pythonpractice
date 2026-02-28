@@ -46,24 +46,25 @@ export function renderTestResults(result) {
     </div>
   `;
 
-  // Parse verbose output into individual test results
-  const testLines = parseTestOutput(result.output);
+  // Use structured test details from Python TestResult
+  const details = result.testDetails || [];
 
-  testLines.forEach((test) => {
+  details.forEach((test) => {
     const isPass = test.status === "ok";
     const itemClass = isPass ? "pass" : "fail";
     const icon = isPass ? "&#10004;" : "&#10008;";
+    const name = `${test.className}.${test.method}`;
 
     html += `
       <div class="test-item ${itemClass}">
         <span class="icon">${icon}</span>
-        <span class="name">${escapeHtml(test.name)}</span>
+        <span class="name">${escapeHtml(name)}</span>
       </div>
     `;
 
     // Show failure details if applicable
     if (!isPass) {
-      const detail = findFailureDetail(test.name, result);
+      const detail = findFailureDetail(name, result);
       if (detail) {
         html += `<div class="failure-detail">${escapeHtml(detail)}</div>`;
       }
@@ -90,39 +91,6 @@ export function renderRunning() {
       <span>Running tests...</span>
     </div>
   `;
-}
-
-function parseTestOutput(output) {
-  const tests = [];
-  const seen = new Set();
-  const lines = output.split("\n");
-
-  for (const line of lines) {
-    const match = line.match(/^(\S+)\s+\(([^)]+)\)\s+\.\.\.\s+(ok|FAIL|ERROR)$/);
-    if (match) {
-      const method = match[1];
-      const rawClassName = match[2];
-      const parts = rawClassName.split(".");
-      let className = rawClassName;
-      if (parts.length >= 2) {
-        const filtered = parts.filter(p => p !== "__main__" && p !== method);
-        className = filtered.length > 0 ? filtered.join(".") : parts[parts.length - 2] || rawClassName;
-      }
-
-      const key = `${className}.${method}`;
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      tests.push({
-        name: key,
-        method: method,
-        className: className,
-        status: match[3].toLowerCase(),
-      });
-    }
-  }
-
-  return tests;
 }
 
 function findFailureDetail(testName, result) {
@@ -289,7 +257,7 @@ function wireTreePlayButtons() {
 export function updateTestStatusMapFromResult(result, targetClassName, targetMethodName) {
   if (result.errorMessage) return;
 
-  const testLines = parseTestOutput(result.output);
+  const details = result.testDetails || [];
 
   if (!targetClassName && !targetMethodName) {
     // Run All: reset everything to pending first
@@ -309,9 +277,11 @@ export function updateTestStatusMapFromResult(result, targetClassName, targetMet
     }
   }
 
-  for (const t of testLines) {
+  for (const t of details) {
     const key = `${t.className}.${t.method}`;
-    state.testStatusMap[key] = t.status;
+    if (key in state.testStatusMap) {
+      state.testStatusMap[key] = t.status;
+    }
   }
 }
 
@@ -371,7 +341,7 @@ export function updateStatusBarAfterTests(result) {
   const passed = result.testsRun - result.failures - result.errors;
   if (result.testsRun === 0) {
     el.textContent = `\u2718 No tests were run`;
-  } else if (result.success) {
+  } else if (result.success && result.testsRun > 0) {
     el.textContent = `\u2714 ${passed}/${result.testsRun} tests passed`;
   } else {
     el.textContent = `\u2718 ${passed}/${result.testsRun} tests passed`;

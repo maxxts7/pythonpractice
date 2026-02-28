@@ -546,9 +546,40 @@ _result = {
     "failures": 0,
     "errors": 0,
     "output": "",
+    "testDetails": [],
     "failureDetails": [],
     "errorDetails": [],
 }
+
+# Custom TestResult that records structured per-test outcomes
+class _DetailedResult(unittest.TextTestResult):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.details = []
+
+    def addSuccess(self, test):
+        super().addSuccess(test)
+        self.details.append({
+            "className": test.__class__.__name__,
+            "method": test._testMethodName,
+            "status": "ok",
+        })
+
+    def addFailure(self, test, err):
+        super().addFailure(test, err)
+        self.details.append({
+            "className": test.__class__.__name__,
+            "method": test._testMethodName,
+            "status": "fail",
+        })
+
+    def addError(self, test, err):
+        super().addError(test, err)
+        self.details.append({
+            "className": test.__class__.__name__,
+            "method": test._testMethodName,
+            "status": "error",
+        })
 
 try:
     # Redirect stdout to capture print statements
@@ -582,16 +613,17 @@ try:
         else:
             _suite.addTests(_loader.loadTestsFromTestCase(_cls))
 
-    # Run with verbose output
+    # Run with structured result collection
     _stream = StringIO()
-    _runner = unittest.TextTestRunner(stream=_stream, verbosity=2)
+    _runner = unittest.TextTestRunner(stream=_stream, verbosity=2, resultclass=_DetailedResult)
     _test_result = _runner.run(_suite)
 
     _result["testsRun"] = _test_result.testsRun
     _result["failures"] = len(_test_result.failures)
     _result["errors"] = len(_test_result.errors)
-    _result["success"] = _test_result.wasSuccessful()
+    _result["success"] = _test_result.wasSuccessful() and _test_result.testsRun > 0
     _result["output"] = _stream.getvalue()
+    _result["testDetails"] = _test_result.details
 
     for _test, _traceback in _test_result.failures:
         _result["failureDetails"].append({
