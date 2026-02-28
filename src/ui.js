@@ -183,6 +183,13 @@ export function renderTestTreeFromStructure() {
     return;
   }
 
+  // Preserve collapsed state before re-rendering
+  const collapsedGroups = new Set();
+  treeContainer.querySelectorAll(".tree-group.collapsed").forEach((el) => {
+    const header = el.querySelector(".tree-group-header");
+    if (header) collapsedGroups.add(header.getAttribute("data-class"));
+  });
+
   let html = "";
 
   for (const group of state.testStructure) {
@@ -212,7 +219,8 @@ export function renderTestTreeFromStructure() {
 
     const passCount = statuses.filter(s => s === "ok").length;
 
-    html += `<div class="tree-group">`;
+    const isCollapsed = collapsedGroups.has(group.className);
+    html += `<div class="tree-group${isCollapsed ? " collapsed" : ""}">`;
     html += `<div class="tree-group-header" data-class="${escapeHtml(group.className)}">`;
     html += `<span class="tree-chevron" onclick="this.closest('.tree-group').classList.toggle('collapsed')">&#9660;</span>`;
     html += `<span class="tree-group-icon" style="color:${groupColor}">${groupIcon}</span>`;
