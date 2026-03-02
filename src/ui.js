@@ -6,10 +6,15 @@ export const state = {
   testStatusMap: {},    // {"ClassName.method_name": "pending"|"ok"|"fail"|"error"|"running"}
 };
 
-// Callback injection to break circular dependency with editor.js
+// Callback injections to break circular dependency with editor.js
 let _runSingleTest = null;
 export function setRunSingleTest(fn) {
   _runSingleTest = fn;
+}
+
+let _navigateToTest = null;
+export function setNavigateToTest(fn) {
+  _navigateToTest = fn;
 }
 
 export function renderTestResults(result) {
@@ -132,6 +137,19 @@ export function initOutputTabs() {
 export function parseTestCodeStructure(testCode) {
   const structure = [];
   const classRegex = /^class\s+(\w+)\s*\(.*TestCase.*\)\s*:/gm;
+  const lines = testCode.split("\n");
+
+  // Build a quick offset-to-line map
+  const lineStartOffsets = [0];
+  for (let i = 0; i < lines.length; i++) {
+    lineStartOffsets.push(lineStartOffsets[i] + lines[i].length + 1);
+  }
+  function offsetToLine(offset) {
+    for (let i = 1; i < lineStartOffsets.length; i++) {
+      if (offset < lineStartOffsets[i]) return i; // 1-based
+    }
+    return lines.length;
+  }
 
   let classMatch;
   while ((classMatch = classRegex.exec(testCode)) !== null) {
@@ -148,7 +166,8 @@ export function parseTestCodeStructure(testCode) {
     let methodMatch;
     const localMethodRegex = /^\s+def\s+(test_\w+)\s*\(\s*self\s*\)/gm;
     while ((methodMatch = localMethodRegex.exec(classBody)) !== null) {
-      methods.push(methodMatch[1]);
+      const line = offsetToLine(classStart + methodMatch.index);
+      methods.push({ name: methodMatch[1], line });
     }
 
     structure.push({ className, methods });
@@ -161,7 +180,7 @@ export function initTestStatusMap(structure) {
   state.testStatusMap = {};
   for (const group of structure) {
     for (const method of group.methods) {
-      state.testStatusMap[`${group.className}.${method}`] = "pending";
+      state.testStatusMap[`${group.className}.${method.name}`] = "pending";
     }
   }
 }
@@ -200,7 +219,7 @@ export function renderTestTreeFromStructure() {
   let html = "";
 
   for (const group of state.testStructure) {
-    const statuses = group.methods.map(m => state.testStatusMap[`${group.className}.${m}`] || "pending");
+    const statuses = group.methods.map(m => state.testStatusMap[`${group.className}.${m.name}`] || "pending");
     const allPending = statuses.every(s => s === "pending");
     const allPass = !allPending && statuses.every(s => s === "ok");
     const anyFail = statuses.some(s => s === "fail" || s === "error");
@@ -238,14 +257,14 @@ export function renderTestTreeFromStructure() {
     html += `<div class="tree-children">`;
 
     for (const method of group.methods) {
-      const key = `${group.className}.${method}`;
+      const key = `${group.className}.${method.name}`;
       const status = state.testStatusMap[key] || "pending";
       const icon = getIconForStatus(status);
 
-      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method)}">`;
+      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" data-line="${method.line}">`;
       html += `<span class="tree-item-icon ${icon.cls}">${icon.html}</span>`;
-      html += `<span class="tree-item-name">${escapeHtml(method)}</span>`;
-      html += `<button class="tree-play-btn" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method)}" title="Run ${escapeHtml(method)}">&#9654;</button>`;
+      html += `<span class="tree-item-name">${escapeHtml(method.name)}</span>`;
+      html += `<button class="tree-play-btn" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" title="Run ${escapeHtml(method.name)}">&#9654;</button>`;
       html += `</div>`;
     }
 
@@ -254,6 +273,7 @@ export function renderTestTreeFromStructure() {
 
   treeContainer.innerHTML = html;
   wireTreePlayButtons();
+  wireTreeItemClicks();
 }
 
 function wireTreePlayButtons() {
@@ -264,6 +284,19 @@ function wireTreePlayButtons() {
       const methodName = btn.getAttribute("data-method");
       if (_runSingleTest) {
         _runSingleTest(className, methodName || null);
+      }
+    });
+  });
+}
+
+function wireTreeItemClicks() {
+  document.querySelectorAll(".tree-item").forEach((item) => {
+    item.addEventListener("click", (e) => {
+      // Don't navigate if the play button was clicked
+      if (e.target.closest(".tree-play-btn")) return;
+      const line = parseInt(item.getAttribute("data-line"), 10);
+      if (_navigateToTest && line) {
+        _navigateToTest(line);
       }
     });
   });

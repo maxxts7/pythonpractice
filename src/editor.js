@@ -7,6 +7,7 @@ import { initializePyodide, executeTests, isPyodideReady } from "./pyodide-runne
 import {
   state,
   setRunSingleTest,
+  setNavigateToTest,
   renderTestResults,
   renderError,
   renderRunning,
@@ -345,6 +346,15 @@ async function runSingleTest(className, methodName) {
 
 // Register the callback so ui.js can call runSingleTest
 setRunSingleTest(runSingleTest);
+
+// Register navigation callback so clicking a test item jumps to its line
+setNavigateToTest((line) => {
+  if (!monacoEditor || !testModel) return;
+  switchEditorTab("test");
+  monacoEditor.revealLineInCenter(line);
+  monacoEditor.setPosition({ lineNumber: line, column: 1 });
+  monacoEditor.focus();
+});
 
 /* === Boot === */
 document.addEventListener("DOMContentLoaded", async () => {
