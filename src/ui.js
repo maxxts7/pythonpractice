@@ -65,7 +65,7 @@ export function renderTestResults(result) {
     const lineAttr = line ? ` data-line="${line}"` : "";
 
     html += `
-      <div class="test-item ${itemClass}"${lineAttr}>
+      <div class="test-item ${itemClass}"${lineAttr} title="${escapeHtml(name)}">
         <span class="icon">${icon}</span>
         <span class="name">${escapeHtml(name)}</span>
       </div>
@@ -289,7 +289,7 @@ export function renderTestTreeFromStructure() {
       const status = state.testStatusMap[key] || "pending";
       const icon = getIconForStatus(status);
 
-      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" data-line="${method.line}">`;
+      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" data-line="${method.line}" title="${escapeHtml(group.className)}.${escapeHtml(method.name)}">`;
       html += `<span class="tree-item-icon ${icon.cls}">${icon.html}</span>`;
       html += `<span class="tree-item-name">${escapeHtml(method.name)}</span>`;
       html += `<button class="tree-play-btn" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" title="Run ${escapeHtml(method.name)}">&#9654;</button>`;
