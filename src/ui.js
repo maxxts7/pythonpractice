@@ -60,8 +60,12 @@ export function renderTestResults(result) {
     const icon = isPass ? "&#10004;" : "&#10008;";
     const name = `${test.className}.${test.method}`;
 
+    // Find line number from parsed test structure
+    const line = findTestLine(test.className, test.method);
+    const lineAttr = line ? ` data-line="${line}"` : "";
+
     html += `
-      <div class="test-item ${itemClass}">
+      <div class="test-item ${itemClass}"${lineAttr}>
         <span class="icon">${icon}</span>
         <span class="name">${escapeHtml(name)}</span>
       </div>
@@ -77,6 +81,7 @@ export function renderTestResults(result) {
   });
 
   pane.innerHTML = html;
+  wireResultItemClicks(pane);
 }
 
 export function renderError(errorMessage) {
@@ -110,6 +115,29 @@ function findFailureDetail(testName, result) {
     }
   }
   return null;
+}
+
+function findTestLine(className, methodName) {
+  for (const group of state.testStructure) {
+    if (group.className === className) {
+      for (const m of group.methods) {
+        if (m.name === methodName) return m.line;
+      }
+    }
+  }
+  return null;
+}
+
+function wireResultItemClicks(pane) {
+  pane.querySelectorAll(".test-item[data-line]").forEach((item) => {
+    item.style.cursor = "pointer";
+    item.addEventListener("click", () => {
+      const line = parseInt(item.getAttribute("data-line"), 10);
+      if (_navigateToTest && line) {
+        _navigateToTest(line);
+      }
+    });
+  });
 }
 
 export function escapeHtml(text) {
