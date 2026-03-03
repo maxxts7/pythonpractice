@@ -591,9 +591,6 @@ try:
     # Execute test code
     exec(${JSON.stringify(testCode)}, globals())
 
-    # Restore stdout before running tests
-    sys.stdout = _original_stdout
-
     # Discover test classes
     _test_classes = []
     for _name, _obj in list(globals().items()):
