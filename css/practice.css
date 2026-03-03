@@ -146,7 +146,8 @@
 }
 
 /* --- Test Explorer Tree --- */
-.test-tree {
+.test-tree,
+.outline-tree {
   flex: 1;
   overflow-y: auto;
   padding: 6px 0;
@@ -796,8 +797,15 @@
   min-height: 100%;
 }
 
-.console-output:empty::before {
-  content: "Console output will appear here after running tests...";
+#print-output:empty::before {
+  content: "Print statements will appear here after running your code...";
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+}
+
+#console-output:empty::before {
+  content: "Test runner output will appear here after running tests...";
   color: var(--text-muted);
   font-style: italic;
   font-weight: 400;

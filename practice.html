@@ -23,6 +23,16 @@
             <path d="M9 3h6v5l3 3-3 3v5H9v-5L6 11l3-3V3z"/>
           </svg>
         </button>
+        <button class="activity-icon" data-panel="outline" title="Solution Outline">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </button>
         <button class="activity-icon" data-panel="problem-desc" title="Problem Description">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
@@ -59,6 +69,18 @@
         <div class="test-tree" id="test-tree">
           <div class="tree-placeholder">
             Run tests to see results here
+          </div>
+        </div>
+      </div>
+
+      <!-- Solution Outline View -->
+      <div class="side-view" id="outline-view">
+        <div class="side-view-header">
+          <span class="side-view-title">Outline</span>
+        </div>
+        <div class="outline-tree" id="outline-tree">
+          <div class="tree-placeholder">
+            Functions and classes will appear here
           </div>
         </div>
       </div>
@@ -131,6 +153,7 @@
       <section class="output-panel">
         <div class="output-tab-bar">
           <button class="output-tab active" data-tab="results">Test Results</button>
+          <button class="output-tab" data-tab="output">Output</button>
           <button class="output-tab" data-tab="console">Console</button>
         </div>
         <div class="output-content">
@@ -139,6 +162,9 @@
               <span class="icon">&#9654;</span>
               <span>Click "Run" or press Ctrl+Enter to run your code</span>
             </div>
+          </div>
+          <div class="output-pane" id="output-pane">
+            <div class="console-output" id="print-output"></div>
           </div>
           <div class="output-pane" id="console-pane">
             <div class="console-output" id="console-output"></div>

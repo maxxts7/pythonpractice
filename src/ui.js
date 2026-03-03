@@ -19,17 +19,20 @@ export function setNavigateToTest(fn) {
 
 export function renderTestResults(result) {
   const pane = document.getElementById("results-pane");
+  const printOutput = document.getElementById("print-output");
   const consoleOutput = document.getElementById("console-output");
 
   // Check for error (syntax/runtime)
   if (result.errorMessage) {
     pane.innerHTML = renderError(result.errorMessage);
+    printOutput.textContent = "";
     consoleOutput.textContent = result.errorMessage;
     return;
   }
 
-  // Update console output
-  consoleOutput.textContent = result.stdout || result.output || "";
+  // Update output tabs: Output = print statements, Console = test runner output
+  printOutput.textContent = result.stdout || "";
+  consoleOutput.textContent = result.output || "";
 
   // Build summary
   const passed = result.testsRun - result.failures - result.errors;
@@ -377,6 +380,103 @@ export function renderTestTree(result) {
 
   updateTestStatusMapFromResult(result, null, null);
   renderTestTreeFromStructure();
+}
+
+/* === Solution Outline === */
+
+let _navigateToSolutionLine = null;
+export function setNavigateToSolutionLine(fn) {
+  _navigateToSolutionLine = fn;
+}
+
+export function parseSolutionStructure(code) {
+  const structure = [];
+  const lines = code.split("\n");
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Top-level class
+    const classMatch = line.match(/^class\s+(\w+)/);
+    if (classMatch) {
+      const cls = { type: "class", name: classMatch[1], line: i + 1, methods: [] };
+      // Collect methods inside this class
+      for (let j = i + 1; j < lines.length; j++) {
+        const mLine = lines[j];
+        // Stop at next top-level definition
+        if (/^(class |def )/.test(mLine)) break;
+        const methodMatch = mLine.match(/^\s+def\s+(\w+)\s*\(/);
+        if (methodMatch) {
+          cls.methods.push({ name: methodMatch[1], line: j + 1 });
+        }
+      }
+      structure.push(cls);
+      continue;
+    }
+
+    // Top-level function
+    const funcMatch = line.match(/^def\s+(\w+)\s*\(/);
+    if (funcMatch) {
+      structure.push({ type: "function", name: funcMatch[1], line: i + 1 });
+    }
+  }
+
+  return structure;
+}
+
+export function renderSolutionOutline(structure) {
+  const container = document.getElementById("outline-tree");
+  if (!container) return;
+
+  if (structure.length === 0) {
+    container.innerHTML = `<div class="tree-placeholder">No functions or classes found</div>`;
+    return;
+  }
+
+  let html = "";
+
+  for (const item of structure) {
+    if (item.type === "class") {
+      html += `<div class="tree-group">`;
+      html += `<div class="tree-group-header" data-line="${item.line}">`;
+      html += `<span class="tree-chevron" onclick="this.closest('.tree-group').classList.toggle('collapsed')">&#9660;</span>`;
+      html += `<span class="tree-group-icon" style="color:var(--accent-blue)">C</span>`;
+      html += `<span class="tree-group-name outline-nav" data-line="${item.line}">${escapeHtml(item.name)}</span>`;
+      html += `</div>`;
+      html += `<div class="tree-children">`;
+
+      for (const method of item.methods) {
+        const icon = method.name.startsWith("_") ? "&#9679;" : "f";
+        html += `<div class="tree-item outline-nav" data-line="${method.line}" title="${escapeHtml(method.name)}">`;
+        html += `<span class="tree-item-icon" style="color:var(--accent-purple)">${icon}</span>`;
+        html += `<span class="tree-item-name">${escapeHtml(method.name)}</span>`;
+        html += `</div>`;
+      }
+
+      html += `</div></div>`;
+    } else {
+      html += `<div class="tree-item outline-nav" data-line="${item.line}" title="${escapeHtml(item.name)}">`;
+      html += `<span class="tree-item-icon" style="color:var(--accent-purple)">f</span>`;
+      html += `<span class="tree-item-name">${escapeHtml(item.name)}</span>`;
+      html += `</div>`;
+    }
+  }
+
+  container.innerHTML = html;
+  wireOutlineClicks(container);
+}
+
+function wireOutlineClicks(container) {
+  container.querySelectorAll(".outline-nav").forEach((el) => {
+    el.style.cursor = "pointer";
+    el.addEventListener("click", (e) => {
+      if (e.target.closest(".tree-chevron")) return;
+      const line = parseInt(el.getAttribute("data-line"), 10);
+      if (_navigateToSolutionLine && line) {
+        _navigateToSolutionLine(line);
+      }
+    });
+  });
 }
 
 /* === Status Bar Updates === */

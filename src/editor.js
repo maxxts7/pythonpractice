@@ -20,6 +20,9 @@ import {
   updateStatusBar,
   updateStatusBarAfterTests,
   escapeHtml,
+  setNavigateToSolutionLine,
+  parseSolutionStructure,
+  renderSolutionOutline,
 } from "./ui.js";
 import { registerPythonSemanticTokensProvider } from "./semantic-tokens.js";
 import { registerPythonCompletionProvider } from "./python-completions.js";
@@ -29,6 +32,8 @@ let currentProblem = null;
 let solutionModel = null;
 let testModel = null;
 let activeTab = "solution";
+// Save/restore cursor position & scroll when switching tabs
+const viewStates = { solution: null, test: null };
 
 function populateSidebar(problem) {
   document.getElementById("sidebar-title").textContent = problem.title;
@@ -154,6 +159,7 @@ function initEditorTabs() {
 
 function switchEditorTab(tab) {
   if (tab === activeTab) return;
+  const prevTab = activeTab;
   activeTab = tab;
 
   const tabs = document.querySelectorAll(".editor-tab[data-tab]");
@@ -167,6 +173,9 @@ function switchEditorTab(tab) {
 
   if (!monacoEditor) return;
 
+  // Save current view state (cursor, scroll, selections) before switching
+  viewStates[prevTab] = monacoEditor.saveViewState();
+
   if (tab === "test" && testModel) {
     monacoEditor.setModel(testModel);
     monacoEditor.updateOptions({ readOnly: true });
@@ -174,6 +183,12 @@ function switchEditorTab(tab) {
     monacoEditor.setModel(solutionModel);
     monacoEditor.updateOptions({ readOnly: false });
   }
+
+  // Restore saved view state for the tab we're switching to
+  if (viewStates[tab]) {
+    monacoEditor.restoreViewState(viewStates[tab]);
+  }
+  monacoEditor.focus();
 }
 
 async function initMonaco(problem) {
@@ -195,6 +210,7 @@ async function initMonaco(problem) {
       fontFamily: "'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace",
       fontLigatures: true,
       minimap: { enabled: false },
+      stickyScroll: { enabled: false },
       scrollBeyondLastLine: false,
       lineNumbers: "on",
       renderLineHighlight: "line",
@@ -224,8 +240,13 @@ async function initMonaco(problem) {
     if (activeTab === "solution") {
       const code = solutionModel.getValue();
       localStorage.setItem(storageKey, code);
+      // Update solution outline on every change
+      renderSolutionOutline(parseSolutionStructure(code));
     }
   });
+
+  // Build initial outline from solution code
+  renderSolutionOutline(parseSolutionStructure(solutionModel.getValue()));
 
   // Ctrl+Enter to run tests
   monacoEditor.addCommand(
@@ -351,6 +372,15 @@ setRunSingleTest(runSingleTest);
 setNavigateToTest((line) => {
   if (!monacoEditor || !testModel) return;
   switchEditorTab("test");
+  monacoEditor.revealLineInCenter(line);
+  monacoEditor.setPosition({ lineNumber: line, column: 1 });
+  monacoEditor.focus();
+});
+
+// Register outline navigation — clicking an outline item jumps to its line in solution
+setNavigateToSolutionLine((line) => {
+  if (!monacoEditor || !solutionModel) return;
+  switchEditorTab("solution");
   monacoEditor.revealLineInCenter(line);
   monacoEditor.setPosition({ lineNumber: line, column: 1 });
   monacoEditor.focus();
