@@ -289,7 +289,7 @@ export function renderTestTreeFromStructure() {
       const status = state.testStatusMap[key] || "pending";
       const icon = getIconForStatus(status);
 
-      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" data-line="${method.line}" title="${escapeHtml(group.className)}.${escapeHtml(method.name)}">`;
+      html += `<div class="tree-item" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" data-line="${method.line}" title="${escapeHtml(method.name)}">`;
       html += `<span class="tree-item-icon ${icon.cls}">${icon.html}</span>`;
       html += `<span class="tree-item-name">${escapeHtml(method.name)}</span>`;
       html += `<button class="tree-play-btn" data-class="${escapeHtml(group.className)}" data-method="${escapeHtml(method.name)}" title="Run ${escapeHtml(method.name)}">&#9654;</button>`;
@@ -310,6 +310,10 @@ function wireTreePlayButtons() {
       e.stopPropagation();
       const className = btn.getAttribute("data-class");
       const methodName = btn.getAttribute("data-method");
+      if (methodName && _navigateToTest) {
+        const line = findTestLine(className, methodName);
+        if (line) _navigateToTest(line);
+      }
       if (_runSingleTest) {
         _runSingleTest(className, methodName || null);
       }
