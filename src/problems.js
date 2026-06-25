@@ -1,5 +1,8 @@
 // === Problem & Repository Storage ===
-// No built-in problems — only user-uploaded and git-imported problems.
+// Built-in default problems (from the PracticePython repo) plus user-uploaded
+// and git-imported problems.
+
+import { DEFAULT_PROBLEMS, DEFAULT_REPO_ID, DEFAULT_REPO_NAME } from "./default-problems.js";
 
 const STORAGE_KEYS = {
   customProblems: "pypractice-custom-problems",
@@ -29,8 +32,16 @@ function rebuildProblems() {
   const custom = loadCustomProblems();
   const repos = loadRepositories();
   const repoProblems = repos.flatMap((r) => r.problems || []);
-  PROBLEMS.push(...custom, ...repoProblems);
+  PROBLEMS.push(...DEFAULT_PROBLEMS, ...custom, ...repoProblems);
 }
+
+// === Built-in default problems ===
+
+export function getDefaultProblems() {
+  return DEFAULT_PROBLEMS;
+}
+
+export { DEFAULT_REPO_ID, DEFAULT_REPO_NAME };
 
 // === Custom (uploaded) problems ===
 

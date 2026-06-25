@@ -4,9 +4,12 @@ import {
   deleteCustomProblem,
   isCustomProblem,
   getCustomProblems,
+  getDefaultProblems,
   getRepositories,
   saveRepository,
   deleteRepository,
+  DEFAULT_REPO_ID,
+  DEFAULT_REPO_NAME,
 } from "./problems.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -33,6 +36,12 @@ document.addEventListener("DOMContentLoaded", () => {
     // "All" tab
     const allTab = makeTab("All", totalCount, "all");
     tabBar.appendChild(allTab);
+
+    // Built-in default problems tab (not deletable)
+    const defaults = getDefaultProblems();
+    if (defaults.length > 0) {
+      tabBar.appendChild(makeTab(DEFAULT_REPO_NAME, defaults.length, DEFAULT_REPO_ID));
+    }
 
     // "Uploaded" tab (only if there are uploaded problems)
     if (custom.length > 0) {
@@ -151,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getFilteredProblems() {
     if (activeTab === "all") return PROBLEMS;
+    if (activeTab === DEFAULT_REPO_ID) return getDefaultProblems();
     if (activeTab === "uploaded") return getCustomProblems();
     // Repo tab
     const repo = getRepositories().find((r) => r.id === activeTab);
